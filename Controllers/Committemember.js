@@ -1,6 +1,6 @@
 // POST API to add new about data
 import committeMember from "../Models/Commitemember.js";
-
+import { sendMail } from "../helpers/sendmail.js";
 export const getcommitemember = async (req, res) => {
   try {
     const members = await committeMember.find({});
@@ -166,8 +166,21 @@ export const createCommitteMember = async (committeMemberData, files) => {
       purpose,
       ...imagesData,
     });
-    const savedCommitteMember = await newCommitteMember.save();
 
+    const members = await committeMember.findOne({ email: email });
+
+    if (members) {
+      return res.status(409).json({
+        error: "Conflict",
+        message: "A Committe member with this email address is already registered."
+      });
+    }
+    
+    const savedCommitteMember = await newCommitteMember.save();
+    sendMail(email,"Sanatan Sewa Sansthan में आपका स्वागत है!",`
+    प्रिय ${name},
+    Sanatan Sewa Sansthan में आपका स्वागत है! 
+    हमारी समुदाय से जुड़ने और हमारे मिशन के प्रति अपनी प्रतिबद्धता दिखाने के लिए धन्यवाद।`)
     return {
       status: 201,
       data: {
