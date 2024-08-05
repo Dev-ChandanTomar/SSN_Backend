@@ -1,4 +1,10 @@
 import About from "../Models/About.js";
+import path from "path"
+import fs from "fs";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // GET API to find about data
 export const getAllAboutData = async (page, limit) => {
   try {
