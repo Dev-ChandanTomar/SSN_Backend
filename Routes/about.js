@@ -11,6 +11,7 @@ import {
   searchAboutById,
   updateAboutById,
 } from "../Controllers/About.js";
+import About from "../Models/About.js";
 
 const routes = express.Router();
 // Convert import.meta.url to __dirname equivalent
@@ -41,6 +42,7 @@ const storage = multer.diskStorage({
   },
 });
 
+
 const upload = multer({ storage: storage });
 
 // Get All Temples
@@ -53,12 +55,17 @@ routes.get("/get-all-about", async (req, res) => {
     res.status(error.status || 500).send({ message: error.message });
   }
 });
+upload.any([
+  { name: "mainImage", maxCount: 1 },
+])
 // Add temple API
 routes.post(
   "/create-about",
   isLoggedIn,
   isAdmin,
-  upload.none(),
+  upload.any([
+    { name: "aboutImage:", maxCount: 1 },
+  ]),
   async (req, res) => {
     try {
       const response = await createAboutData(req.body, req.files);
@@ -70,10 +77,31 @@ routes.post(
   }
 );
 
+const deleteImage = (imageName) => {
+  if (imageName) {
+    const imagePath = path.join(
+      __dirname,
+      "../public/about",
+      imageName
+    ); // Adjust the path according to your directory structure
+    console.log("g",imagePath)
+    fs.unlink(imagePath, (err) => {
+      if (err) {
+        console.error("Error deleting image file:", err);
+      }
+    });
+  }
+};
 // Delete Temple by ID
 routes.delete("/delete-about/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    const about = await About.findById(id);
+    console.log("dtaa",about)
+    if (!about) {
+      return { status: 404, message: "About not found" };
+    }
+    deleteImage(about.aboutImage.image);
     const response = await deleteAboutById(id);
     res.status(response.status).send({ message: response.message });
   } catch (error) {
@@ -88,11 +116,13 @@ routes.put(
   "/update-about",
   isLoggedIn,
   isAdmin,
-  upload.none(),
+  upload.any([
+    { name: "aboutImage:", maxCount: 1 },
+  ]),
   async (req, res) => {
     try {
       const AboutData = req.body;
-      const response = await updateAboutById(AboutData);
+      const response = await updateAboutById(AboutData,req.files);
 
       res
         .status(response.status)

@@ -44,7 +44,7 @@ export const createAboutData = async (AboutData, files) => {
         image: files.find((file) => file.fieldname === "aboutImage").filename,
       };
     }
-
+  console.log("uu",imagesData)
     const newAboutData = new About({
       title,
       description,
@@ -120,11 +120,18 @@ export const updateAboutById = async (AboutData, files) => {
         image: files.find((file) => file.fieldname === "aboutImage").filename,
       };
     }
-
+    
+   
+   
+    console.log("uu",files)
     const updateAbout = {
       ...AboutData,
       ...imagesData,
     };
+
+    // const updatedTemple = await Temple.findByIdAndUpdate(templeId, updateData, {
+    //   new: true,
+    // });
 
     const updateAboutData = await About.findByIdAndUpdate(
       AboutData.id,
