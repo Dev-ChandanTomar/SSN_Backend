@@ -50,6 +50,7 @@ routes.get("/get-all-about", async (req, res) => {
   try {
     const { page = 0, limit = 10 } = req.query;
     const val = await getAllAboutData(parseInt(page), parseInt(limit));
+    console.log("dd",val)
     res.status(val.status).send(val);
   } catch (error) {
     res.status(error.status || 500).send({ message: error.message });

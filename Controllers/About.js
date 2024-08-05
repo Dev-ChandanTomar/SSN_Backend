@@ -13,6 +13,7 @@ export const getAllAboutData = async (page, limit) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+   
     return { status: 200, data: data };
   } catch (error) {
     console.error("Error retrieving About:", error);
